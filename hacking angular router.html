@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+<html ng-app="myapp">
+<head>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title></title>
+	
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.16/angular.min.js"></script>
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.16/angular-route.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/css/bootstrap.min.css">
+  
+    <script type="text/javascript">
+    
+    
+/*
+
+	experiment in hacking angular router so all pages in multi page app are NOT destroyed
+	ie 
+	ng-view is not used
+	
+	instead ng-show is used on pre-existing dom pages (these could be loaded html partials)
+	
+	
+	this could be useful for an
+	animation where we slide from one page to another 
+	as this would need both pages visible at same time
+
+*/
+    
+    
+        
+
+		var myapp = angular.module('myapp', ['ngRoute']);
+
+		myapp.controller(
+			'appcontrol',
+			function($scope, $location, $log) {
+				$scope.isActive = function(route) {
+					return route === $location.path();
+				}
+				$scope.currentPage = {};
+				$scope.setCurrentPage = function(arg){
+					$log.log('currentPage = ',arg);
+					$scope.currentPage.home = null;
+					$scope.currentPage.pagea = null;
+					$scope.currentPage.pageb = null;
+					$scope.currentPage.pagec = null;
+					$scope.currentPage.nothing = null;
+					if (typeof $scope.currentPage[arg] === 'undefined') {
+						$scope.currentPage.nothing = 1;
+					} else {
+						$scope.currentPage[arg] = 1;
+					}					
+				}
+			}
+		);	
+		
+		
+		// note that <div ng-view></div> was moved to within 'appcontrol' scope that way setCurrentPage can be called
+		myapp.config(specifyRoutes);
+		function specifyRoutes ($routeProvider) {
+			$routeProvider
+				.when('/', {template: '', controller: function($scope){ $scope.setCurrentPage('home'); }})
+				.when('/pagea', {template: '', controller: function($scope){ $scope.setCurrentPage('pagea'); }})						.when('/pageb', {template: '', controller: function($scope){ $scope.setCurrentPage('pageb'); }})
+				.when('/pagec', {template: '', controller: function($scope){ $scope.setCurrentPage('pagec'); }})
+				.otherwise({template: '', controller: function($scope){ $scope.setCurrentPage('default'); }})
+		}		
+				    
+	</script>	
+	
+
+</head>
+<body>
+	<div ng-controller="appcontrol">
+		<div class="container">
+			<a href="#" class="btn btn-default" ng-class="{active:isActive('/')}">Home</a>
+			<a href="#/pagea" class="btn btn-default" ng-class="{active:isActive('/pagea')}">Page A</a>
+			<a href="#/pageb" class="btn btn-default" ng-class="{active:isActive('/pageb')}">Page B</a>
+			<a href="#/pagec" class="btn btn-default" ng-class="{active:isActive('/pagec')}">Page C</a>
+		</div>	
+		<div ng-view></div>
+		<!-- ng-view  moved to within 'appcontrol', setCurrentPage can now be called on the ng-view scope -->
+		<div class="container">
+			<div ng-show="currentPage.home">This is the Home Page</div>
+			<div ng-show="currentPage.pagea">This is the page for the letter A</div>
+			<div ng-show="currentPage.pageb">This is the page for the letter B</div>
+			<div ng-show="currentPage.pagec">This is the page for the letter C</div>
+			<div ng-show="currentPage.nothing">-- nothing loaded --</div>			
+		</div>		
+	</div>
+</body>
+</html>
