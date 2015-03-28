@@ -10,3 +10,12 @@ hacking-angular-router
 	this could be useful for an
 	animation where we slide from one page to another 
 	as this would need both pages visible at same time
+	
+	my relevant repos
+
+https://github.com/PrimeLens/hacking-angular-router
+
+https://github.com/PrimeLens/angular-multipage-boilerplate
+
+https://github.com/PrimeLens/angular-multipage-boilerplate-with-node
+
